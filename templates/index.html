@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Comment Sentiment Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <h1>Comment Sentiment Analyzer</h1>
+        <div class="controls">
+          <label class="switch">
+            <input id="darkToggle" type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="left">
+          <div class="card">
+            <h2>Analyze a single comment</h2>
+            <textarea id="commentBox" placeholder="Type or paste a comment..."></textarea>
+            <div class="row">
+              <button id="analyzeBtn">Analyze</button>
+              <button id="sampleBtn">Load Sample</button>
+            </div>
+            <div id="singleResult" class="result"></div>
+          </div>
+
+          <div class="card">
+            <h2>Batch analyze (upload .txt)</h2>
+            <p class="muted">One comment per line.</p>
+            <input id="fileInput" type="file" accept=".txt" />
+            <div id="batchResult" class="result"></div>
+            <div class="row">
+              <a id="downloadSample" class="link" href="/static/uploads/sample_comments.txt" download>Download sample file</a>
+            </div>
+          </div>
+        </section>
+
+        <aside class="right">
+          <div class="card chart-card">
+            <h2>Summary</h2>
+            <canvas id="pieChart"></canvas>
+            <div id="summaryStats" class="stats"></div>
+          </div>
+
+          <div class="card">
+            <h2>Top comments</h2>
+            <div id="topList" class="list"></div>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="footer">
+        <small>Made for college mini-project • Use responsibly</small>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>
