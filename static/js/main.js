@@ -97,7 +97,7 @@ function updateChart(summary){
       datasets:[{
         label: 'Comment Sentiment',
         data: values,
-        backgroundColor: chartColors, // <-- ADDED THIS
+        backgroundColor: chartColors, // <-- THIS LINE FIXES THE GRAPH
         hoverOffset: 4
       }]
     },
