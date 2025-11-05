@@ -2,13 +2,8 @@ import os
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from textblob import TextBlob
 from werkzeug.utils import secure_filename
-import nltk
-
-# Ensure NLTK corpora for TextBlob
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+# We no longer need to import nltk here or download 'punkt'
+# The build.sh script now handles the NLTK download.
 
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 ALLOWED_EXTENSIONS = {'txt'}
@@ -87,27 +82,39 @@ def polarity_to_emoji(p):
 def analyze_file(path):
     positive = negative = neutral = 0
     items = []
-    with open(path, encoding='utf-8') as f:
-        for line in f:
-            text = line.strip()
-            if not text:
-                continue
-            blob = TextBlob(text)
-            p = round(blob.sentiment.polarity, 4)
-            if p > 0.05:
-                label = 'Positive'
-                positive += 1
-            elif p < -0.05:
-                label = 'Negative'
-                negative += 1
-            else:
-                label = 'Neutral'
-                neutral += 1
-            items.append({'text': text, 'polarity': p, 'label': label, 'emoji': polarity_to_emoji(p)})
+    try:
+        with open(path, encoding='utf-8') as f:
+            for line in f:
+                text = line.strip()
+                if not text:
+                    continue
+                blob = TextBlob(text)
+                p = round(blob.sentiment.polarity, 4)
+                if p > 0.05:
+                    label = 'Positive'
+                    positive += 1
+                elif p < -0.05:
+                    label = 'Negative'
+                    negative += 1
+                else:
+                    label = 'Neutral'
+                    neutral += 1
+                items.append({'text': text, 'polarity': p, 'label': label, 'emoji': polarity_to_emoji(p)})
+    except Exception as e:
+        # Handle file read errors, e.g., wrong encoding
+        return {'error': f'Error processing file: {e}'}
+
 
     total = positive + negative + neutral
     if total == 0:
-        total = 1
+        # Avoid ZeroDivisionError if the file was empty
+        summary = {
+            'total': 0, 'positive': 0, 'negative': 0, 'neutral': 0,
+            'positive_pct': 0, 'negative_pct': 0, 'neutral_pct': 0,
+            'items': []
+        }
+        return summary
+    
     summary = {
         'total': total,
         'positive': positive,
